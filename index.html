@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang='en'>
+    <head>
+        <meta charset='UTF-8' />
+        <title>Run Function Map</title>
+    </head>
+    <body>
+        <script>
+            function runAll(funcMap) {
+                const results = {};
+                for (const key in funcMap) {
+                    try {
+                        results[key] = funcMap[key]() + '';
+                    } catch (e) {
+                        results[key] = e.message;
+                    }
+                }
+                return results;
+            }
+
+            const checks = {
+                'chrome-136-RegEscape': () => { RegExp.escape('x'); return 'ok'; },
+                'chrome-136-CanvasLang': () => { const c = new OffscreenCanvas(1, 1).getContext('2d'); c.lang = 'ja'; return 'ok'; },
+                'chrome-136-ProgressEvent': () => { new ProgressEvent('progress', { lengthComputable: true, loaded: 1, total: 1 }); return 'ok'; },
+                'chrome-136-PAEncodeUtf8': () => { protectedAudience.encodeUtf8('hi'); return 'ok'; },
+
+                'chrome-135-Float16Array': () => { new Float16Array(2); return 'ok'; },
+                'chrome-135-FetchLater': () => { fetchLater('data:,', { activateAfter: 1000 }); return 'ok'; },
+                'chrome-135-SetInterval': () => { const i = setInterval(() => {}, 0); clearInterval(i); return 'ok'; },
+                'chrome-135-Highlights': () => { document.highlightsFromPoint(0, 0); return 'ok'; },
+                'chrome-135-ObservableAPI': () => { new Observable((s) => { s.next(1); s.complete(); }); return 'ok'; },
+
+                'chrome-134-OffscreenCtxAttrs': () => { new OffscreenCanvas(1, 1).getContext('2d').getContextAttributes(); return 'ok'; },
+                'chrome-134-TimeStamp': () => { console.timeStamp('t'); return 'ok'; },
+                'chrome-134-DialogClosedBy': () => { const d = document.createElement('dialog'); d.closedby = 'none'; return 'ok'; },
+                'chrome-134-BaseSelect': () => { const s = document.createElement('select'); s.style.appearance = 'base-select'; return 'ok'; },
+                'chrome-134-WebLocksAPI': () => { navigator.locks.request('chrome_feature_test_lock', (l) => {}); return 'ok'; },
+                'chrome-134-ImageSmoothingQuality': () => { const c = document.createElement('canvas').getContext('2d'); c.imageSmoothingQuality = 'high'; return c.imageSmoothingQuality === 'high'; },
+
+                'chrome-133-MoveBefore': () => { const a = document.createElement('div'); const b = document.createElement('div'); b.moveBefore(a); return 'ok'; },
+                'chrome-133-AnimationProgress': () => { new Animation().overallProgress; return '\'ok'; },
+                'chrome-133-Clipboard': () => { new ClipboardItem({ 'text/plain': Promise.resolve('x') }); return 'ok'; },
+                'chrome-133-PopoverHint': () => { const e = document.createElement('div'); e.setAttribute('popover', 'hint'); return 'ok'; },
+                'chrome-133-NodeMoveBefore': () => { const p = document.createElement('div'), c1 = document.createElement('s'), c2 = document.createElement('s'); p.append(c1, c2); p.moveBefore(c2, c1); return p.firstChild === c2; },
+                'chrome-133-GetClientCapabilities': () => { PublicKeyCredential.getClientCapabilities('public-key'); return 'ok'; },
+
+                'chrome-133-FileSystemObserver': () => { new FileSystemObserver(()=>{}); return 'ok' },
+
+                'chrome-132-ThrowShowModal': () => { var d = document.implementation.createHTMLDocument(); d.body.appendChild(d.createElement('dialog')).showModal();; return 'ok' },
+                'chrome-132-DevicePosture': () => { return 'devicePosture' in navigator; },
+                'chrome-132-RequestBytes': () => { return 'bytes' in Request.prototype; },
+                'chrome-132-WebViewFileSystemAccess': () => { return 'showOpenFilePicker' in globalThis; },
+
+                'chrome-131-RemovalRequestAdapterInfo': () => { return 'requestAdapterInfo' in GPUAdapter.prototype; },
+                'chrome-131-TrialTranslator': () => { return 'Translator' in globalThis; },
+                'chrome-131-RemovalInsetArea': () => { return 'inset-area' in document.body.style; },
+                'chrome-131-TrialPlayoutStats': () => { return 'playoutStats' in AudioContext; },
+                'chrome-131-GPUCanvasContext': () => { return 'getConfiguration' in GPUCanvasContext.prototype; },
+                'chrome-131-AnchorScope': () => { return 'anchor-scope' in document.body.style; },
+
+                'chrome-130-RemovalDelegatedInkTrailPresenter': () => { return 'expectedImprovement' in DelegatedInkTrailPresenter.prototype; },
+                'chrome-130-TrialLanguageDetector': () => { return 'LanguageDetector' in globalThis; },
+                'chrome-130-URLParseNonSpecial': () => { return new URL('git://ok/foo').hostname; },
+                'chrome-130-RemovalURLParseJSSpaced': () => { new URL('javascript://comment includes space'); return 'ok'},
+                'chrome-130-SerialPort': () => { return 'connected' in SerialPort.prototype; },
+
+                'chrome-129-RemovalGetInnerHTML': () => { document.body.getInnerHTML(); return "ok"; },
+                'chrome-129-SerialPort': () => { return 'connected' in SerialPort.prototype; },
+                'chrome-129-PositionArea': () => { return 'positionArea' in document.body.style; },
+                'chrome-129-PublicKeyCredential': () => { return 'toJSON' in PublicKeyCredential.prototype; },
+                'chrome-129-SchedYield': () => { scheduler.yield(); return 'ok'; },
+                'chrome-129-IntlDurationFormat': () => { new Intl.DurationFormat(); return 'ok'; },
+                'chrome-129-InterpolateSize': () => { return 'interpolateSize' in document.body.style; },
+
+                'chrome-128-PointerEventDeviceProperties': () => { return 'persistentDeviceId' in PointerEvent.prototype; },
+                'chrome-128-AudioContext': () => { return 'onerror' in AudioContext.prototype; },
+                'chrome-128-CaretPos': () => { return 'caretPositionFromPoint' in document;},
+                'chrome-128-PromiseTry': () => {  Promise.try(() => {}); return 'ok'; },
+                'chrome-128-NavigatorShare': () => {  return 'share' in navigator; },
+
+                'chrome-127-OnScrollSnapChange': () => { return 'onscrollsnapchange' in HTMLElement.prototype; },
+                'chrome-127-FontSizeAdjust': () => { return 'fontSizeAdjust' in document.body.style; },
+                'chrome-127-GPUInfo': () => { return 'info' in GPUAdapter.prototype; },
+
+                'chrome-126-CloseWatcher': () => { new CloseWatcher(); return 'ok' },
+                'chrome-126-GeolocationCoordinates': () => { return 'toJSON' in GeolocationCoordinates.prototype; },
+
+            };
+
+            const output = runAll(checks);
+            const pre = document.createElement('pre');
+            pre.textContent = JSON.stringify(output, null, 2);
+            document.body.appendChild(pre);
+        </script>
+    </body>
+</html>
